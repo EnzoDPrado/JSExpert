@@ -57,7 +57,7 @@ myMap.delete(reference)
 
 
   const weakMap = new WeakMap()
-  const hero = {name: 'Flash'}
+  const hero = {name: 'Flash'} 
 
   weakMap.get(hero)
   weakMap.set(hero)
