@@ -41,7 +41,7 @@ async function* systemInfo() {
 //   }
 // })();
 
-;(async () => {
+(async () => {
   for await (const item of systemInfo()) {
     console.log('systemInfo', item);
   }
