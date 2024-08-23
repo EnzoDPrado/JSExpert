@@ -1,96 +1,108 @@
-'use strict'
+// Define property with Reflect
+{
+  const product = {
+    name: 'any_name',
+    value: 100,
+    description: 'Any Description',
+  };
 
-const { deepEqual } = require('assert')
-const assert = require('assert')
+  Reflect.defineProperty(product, 'data', {
+    value: {
+      createdAt: new Date('01-01-2020'),
+      owner: {
+        name: 'Ruan',
+        lastName: 'Silva',
+        createdAt: new Date('01-01-2016'),
+      },
+    },
+    writable: true, // Permite que a propriedade seja modificada posteriormente. O padrão é false.
+    enumerable: true, // Se true, a propriedade será listada durante a enumeração das propriedades do objeto (como em um for...in ou Object.keys). O padrão é false.
+    configurable: true, // Permite que a propriedade seja removida ou suas características (exceto seu valor) sejam alteradas. O padrão é false
+  });
 
-// garantir semantica e segurança em objetos
-
-// ---- apply
-const myObj = {
-    add(myValue) {
-        return this.arg1 + this.arg2 + myValue
-    }
+  console.log('Product after define:', product);
 }
-// Function.prototype.apply = () => { throw new TypeError('Eita!')}
-// myObj.add.apply = function () { throw new Error('Vixxx')}
+// Delete property with Reflect
+{
+  const product = {
+    name: 'any_name',
+    value: 100,
+    description: 'Any Description',
+    data: {
+      createdAt: new Date('01-01-2020'),
+      owner: {
+        name: 'Ruan',
+        lastName: 'Silva',
+        createdAt: new Date('01-01-2016'),
+      },
+    },
+  };
 
-assert.deepStrictEqual(myObj.add.apply({ arg1: 10, arg2: 20 }, [100]), 130)
+  Reflect.deleteProperty(product.data.owner, 'createdAt');
 
-// um problema que pode acontecer (raro)
-// Function.prototype.apply = () => { throw new TypeError('Eita!')}
+  console.log('Product after delete:', product);
+}
 
-// esse aqui pode acontecer!
-myObj.add.apply = function () { throw new TypeError('Vixxx') }
+// Get property with Reflect
+{
+  const product = {
+    name: 'any_name',
+    value: 100,
+    description: 'Any Description',
+    data: {
+      createdAt: new Date('01-01-2020'),
+      owner: {
+        name: 'Ruan',
+        lastName: 'Silva',
+        createdAt: new Date('01-01-2016'),
+      },
+    },
+  };
 
-assert.throws(
-    () => myObj.add.apply({}, []),
+  const value = Reflect.get(product, 'value');
+
+  console.log('Get value test:\n', value);
+}
+
+// Has property with Reflect
+{
+  const products = [
     {
-        name: "TypeError",
-        message: 'Vixxx'
+      name: 'any_name_1',
+      value: 100,
+      description: 'Any Description',
+      data: {
+        createdAt: new Date('01-01-2020'),
+        owner: {
+          name: 'Ruan',
+          lastName: 'Silva',
+          createdAt: new Date('01-01-2016'),
+          employerId: 1,
+        },
+      },
+    },
+    {
+      name: 'any_name_2',
+      value: 100,
+      description: 'Any Description',
+      data: {
+        createdAt: new Date('01-01-2020'),
+        owner: {
+          name: 'Ruan',
+          lastName: 'Silva',
+          createdAt: new Date('01-01-2016'),
+          bossId: 1,
+        },
+      },
+    },
+  ];
+
+  for (const product of products) {
+    if (Reflect.has(product.data.owner, 'bossId')) {
+      console.log(product.name, 'belongs an a boss');
+      continue;
     }
-)
 
-// usando reflect:
-const result = Reflect.apply(myObj.add, { arg1: 40, arg2: 20}, [200])
-assert.deepStrictEqual(result, 260)
-// ---- apply
-
-// --- defineProperty
-
-// questoes semanticas
-function MyDate() {}
-
-// feio pra Kct, tudo é Object, mas Object adicionando prop para uma function?
-Object.defineProperty(MyDate, 'withObject', { value: () => 'Hey there'})
-
-// agora faz mais sentido
-Reflect.defineProperty(MyDate, 'withReflection', { value: () => 'Hey dude'})
-
-assert.deepStrictEqual(MyDate.withObject(), 'Hey there')
-assert.deepStrictEqual(MyDate.withReflection(), 'Hey dude')
-// --- defineProperty
-
-// --- deleteProperty
-const withDelete = { user: 'ErickWendel'}
-// imperformático, evitar ao máximo
-delete withDelete.user
-
-assert.deepStrictEqual(withDelete.hasOwnProperty('user'), false)
-
-const withReflection = { user: 'XuxaDaSilva'}
-Reflect.deleteProperty(withReflection, "user")
-assert.deepStrictEqual(withReflection.hasOwnProperty("user"), false)
-
-// --delete Property
-
-//  ---- get
-
-// Deveriamos fazer um get somente em instancias de referencia
-assert.deepStrictEqual(1['userName'], undefined)
-// com reflection, uma exceçao é lançada!
-assert.throws(() => Reflect.get(1, "userName"), TypeError)
-//  ---- get
-
-//  --- has
-assert.ok('superman' in { superman: ''})
-assert.ok(Reflect.has({batman: ''}, "batman"))
-//  --- has
-
-// --- ownKeys
-const user = Symbol('user')
-const databaseUser = {
-    id: 1,
-    [Symbol.for('password')]: 123,
-    [user]: 'erickwendel'
+    console.log(product.name, 'belongs an a employer');
+  }
 }
-
-// Com os metodos de object, temos que fazer 2 requisicoes
-const objectKeys = [
-    ...Object.getOwnPropertyNames(databaseUser),
-    ...Object.getOwnPropertySymbols(databaseUser),
-]
-assert.deepStrictEqual(objectKeys, ['id', Symbol.for('password'), user])
-
-// com reflection, só um método
-assert.deepStrictEqual(Reflect.ownKeys(databaseUser), ['id', Symbol.for('password'), user])
-// --- ownKeys
