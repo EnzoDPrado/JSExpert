@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-   "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --watch --config ./jest.config.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --watch --config ./jest.config.js",
     "tes:cov": "NODE_OPTIONS=--experimental-vm-modules npx jest --config ./jest.config.js --coverage"
   },
   "keywords": [],
@@ -12,6 +12,6 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "jest": "^26.6.3"
+    "jest": "^29.7.0"
   }
 }
